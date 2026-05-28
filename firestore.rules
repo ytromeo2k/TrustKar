@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return isSignedIn() && userDoc().data.role == 'admin';
+    }
+
+    function isTransactionParty(transaction) {
+      return isSignedIn() &&
+        (request.auth.uid == transaction.data.buyerId ||
+         request.auth.uid == transaction.data.sellerId);
+    }
+
+    // Ads: public read active; seller CRUD own; admin full
+    match /ads/{adId} {
+      allow read: if resource.data.status == 'active'
+        || (isSignedIn() && resource.data.sellerId == request.auth.uid)
+        || isAdmin();
+      allow create: if isSignedIn()
+        && request.resource.data.sellerId == request.auth.uid
+        && request.resource.data.status == 'active';
+      allow update, delete: if isSignedIn() && (
+        resource.data.sellerId == request.auth.uid || isAdmin()
+      );
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isSignedIn() || isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /wishlist/{adId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /views/{viewId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /paymentProofs/{proofId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    match /transactions/{txId} {
+      allow read: if isTransactionParty(resource) || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isTransactionParty(resource) || isAdmin();
+    }
+
+    match /disputes/{disputeId} {
+      allow create: if isSignedIn();
+      allow read, update: if isSignedIn() &&
+        (request.auth.uid == resource.data.buyerId ||
+         request.auth.uid == resource.data.sellerId ||
+         request.auth.uid == resource.data.raisedBy)
+        || isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.buyerId == request.auth.uid;
+      allow update, delete: if isAdmin()
+        || (isSignedIn() && resource.data.buyerId == request.auth.uid);
+    }
+
+    match /support_tickets/{ticketId} {
+      allow create: if isSignedIn();
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow update: if isAdmin();
+    }
+
+    match /admin_logs/{logId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /notifications/{notifId} {
+      allow read, write: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if isSignedIn();
+    }
+  }
+}

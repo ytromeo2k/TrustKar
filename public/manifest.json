@@ -1,0 +1,11 @@
+{
+  "name": "TrustKar — Escrow Marketplace",
+  "short_name": "TrustKar",
+  "description": "Pakistan's secure buy & sell marketplace with escrow protection",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f7f9",
+  "theme_color": "#00b4d8",
+  "orientation": "portrait-primary",
+  "icons": []
+}

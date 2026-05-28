@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  :root {
+    --tk-primary: #00b4d8;
+    --tk-primary-hover: #0096b4;
+    --tk-primary-dark: #0284c7;
+    --tk-bg: #f4f7f9;
+    --tk-hero: #eaf4fb;
+    --tk-text: #0f172a;
+    --tk-muted: #64748b;
+    --tk-border: #e2e8f0;
+    --tk-card: #ffffff;
+    --tk-radius: 1.25rem;
+    --tk-radius-lg: 1.75rem;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body {
+    font-family: var(--font-inter), "Inter", system-ui, sans-serif;
+    background-color: var(--tk-bg);
+    color: var(--tk-text);
+    padding-bottom: var(--safe-bottom);
+  }
+}
+
+@layer components {
+  .tk-container {
+    @apply mx-auto w-full max-w-[1300px] px-4 sm:px-5 lg:px-6;
+  }
+
+  .tk-card {
+    @apply rounded-[var(--tk-radius-lg)] border border-[var(--tk-border)] bg-white p-6 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.06)];
+  }
+
+  .tk-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-[#00b4d8] to-[#0284c7] px-6 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_rgba(0,180,216,0.3)] transition hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(0,180,216,0.4)];
+  }
+
+  .tk-btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-[var(--tk-border)] bg-white px-6 py-2.5 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50;
+  }
+
+  .tk-input {
+    @apply w-full rounded-2xl border border-[var(--tk-border)] bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-[var(--tk-primary)] focus:bg-white focus:ring-[3px] focus:ring-cyan-500/15;
+  }
+
+  .tk-section-title {
+    @apply text-lg font-extrabold text-slate-900 sm:text-xl;
+  }
+
+  .tk-pill {
+    @apply cursor-pointer rounded-full bg-cyan-100/80 px-4 py-1.5 text-xs font-semibold text-cyan-800 transition hover:bg-cyan-200;
+  }
+
+  .tk-slider {
+    @apply flex gap-4 overflow-x-auto pb-4 scroll-smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tk-slider::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pb-mobile-nav {
+    padding-bottom: calc(4.5rem + var(--safe-bottom));
+  }
+
+  @media (min-width: 768px) {
+    .pb-mobile-nav {
+      padding-bottom: 0;
+    }
+  }
+}
